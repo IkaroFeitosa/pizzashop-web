@@ -12,7 +12,6 @@ import {
   YAxis,
   CartesianGrid,
   Line,
-  Tooltip,
 } from "recharts";
 
 import colors from "tailwindcss/colors";
@@ -76,6 +75,7 @@ export function RevenueCharts() {
                 })
               }
             />
+            <CartesianGrid vertical={false} className="stroke-muted" />
             <Line
               type={"linear"}
               dataKey="revenue"
