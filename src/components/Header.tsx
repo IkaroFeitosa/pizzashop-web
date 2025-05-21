@@ -21,8 +21,8 @@ export function Header() {
           </NavLink>
         </nav>
         <div className="ml-auto flex items-center gap-4">
-          <AccountMenu />
           <ThemeToggle />
+          <AccountMenu />
         </div>
       </div>
     </header>
