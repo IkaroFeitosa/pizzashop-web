@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { signIn } from "@/api/sign-in";
@@ -17,12 +17,16 @@ const signInForm = z.object({
 type SignInForm = z.infer<typeof signInForm>;
 
 export function Signin() {
+  const [searchParams] = useSearchParams();
   const {
     register,
     handleSubmit,
     formState: { isSubmitting },
   } = useForm<SignInForm>({
     resolver: zodResolver(signInForm),
+    defaultValues: {
+      email: searchParams.get("email") ?? "",
+    },
   });
 
   const { mutateAsync: authenticate } = useMutation({
