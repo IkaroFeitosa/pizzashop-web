@@ -13,10 +13,13 @@ export interface IGetOrdersResponse {
     totalCount: number;
   };
 }
-export async function getOrders() {
+export interface IGetOrdersQuery {
+  pageIndex?: number | null;
+}
+export async function getOrders({ pageIndex }: IGetOrdersQuery) {
   const response = await api.get<IGetOrdersResponse>("/orders", {
     params: {
-      pageIndex: 0,
+      pageIndex,
     },
   });
   return response.data;
