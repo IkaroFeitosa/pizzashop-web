@@ -22,7 +22,7 @@ import { toast } from "sonner";
 
 const sotreProfileSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
-  description: z.string(),
+  description: z.string().nullable(),
 });
 
 type TStoreProfileForm = z.infer<typeof sotreProfileSchema>;
@@ -46,22 +46,34 @@ export function StoreProfileDialog() {
       description: managedRestaurant?.description ?? "",
     },
   });
-
+  function updateManagerRestaurantCache({
+    name,
+    description,
+  }: TStoreProfileForm) {
+    const cached = queryClient.getQueryData<IGetManagedRestaurantResponse>([
+      "managed-restaurant",
+    ]);
+    if (cached) {
+      queryClient.setQueryData<IGetManagedRestaurantResponse>(
+        ["managed-restaurant"],
+        {
+          ...cached,
+          name,
+          description,
+        },
+      );
+    }
+    return { cached };
+  }
   const { mutateAsync: updateProfileFn } = useMutation({
     mutationFn: updateProfile,
-    onSuccess(_, { name, description }) {
-      const cached = queryClient.getQueryData<IGetManagedRestaurantResponse>([
-        "managed-restaurant",
-      ]);
-      if (cached) {
-        queryClient.setQueryData<IGetManagedRestaurantResponse>(
-          ["managed-restaurant"],
-          {
-            ...cached,
-            name,
-            description,
-          },
-        );
+    onMutate({ name, description }) {
+      const { cached } = updateManagerRestaurantCache({ name, description });
+      return { previousProfile: cached };
+    },
+    onError(_, __, context) {
+      if (context?.previousProfile) {
+        updateManagerRestaurantCache(context.previousProfile);
       }
     },
   });
