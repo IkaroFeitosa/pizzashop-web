@@ -7,6 +7,9 @@ import { OrderStatus } from "./order-status";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { cancelOrder } from "@/api/cancel-orders";
+import type { IGetOrdersResponse } from "@/api/get-orders";
 interface IOrderTableRowProps {
   order: {
     orderId: string;
@@ -18,6 +21,27 @@ interface IOrderTableRowProps {
 }
 export function OrderTableRow({ order }: IOrderTableRowProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const { mutateAsync: cancelOrderFn } = useMutation({
+    mutationFn: cancelOrder,
+    onSuccess(_, { orderId }) {
+      const ordersListCached = queryClient.getQueriesData<IGetOrdersResponse>({
+        queryKey: ["orders"],
+      });
+      ordersListCached.forEach(([cachedKey, cachedData]) => {
+        if (!cachedData) return;
+        queryClient.setQueryData<IGetOrdersResponse>(cachedKey, {
+          ...cachedData,
+          orders: cachedData.orders.map((order) => {
+            if (order.orderId === orderId) {
+              return { ...order, status: "canceled" };
+            }
+            return order;
+          }),
+        });
+      });
+    },
+  });
   return (
     <TableRow>
       <TableCell>
@@ -57,7 +81,12 @@ export function OrderTableRow({ order }: IOrderTableRowProps) {
         </Button>
       </TableCell>
       <TableCell>
-        <Button variant="ghost" size={"xs"}>
+        <Button
+          disabled={!["pending", "processing"].includes(order.status)}
+          variant="ghost"
+          size={"xs"}
+          onClick={() => cancelOrderFn({ orderId: order.orderId })}
+        >
           <X className="h-3 w-3 mr-2" />
           Cancelar
         </Button>
