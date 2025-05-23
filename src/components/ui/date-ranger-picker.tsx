@@ -13,6 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { ptBR } from "date-fns/locale";
 interface IDateRagePickerProps extends React.ComponentProps<"div"> {
   date?: DateRange;
   onDateRange: (date?: DateRange) => void;
@@ -57,6 +58,7 @@ export function DatePickerWithRange({
             selected={date}
             onSelect={onDateRange}
             numberOfMonths={2}
+            locale={ptBR}
           />
         </PopoverContent>
       </Popover>
