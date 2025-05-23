@@ -1,4 +1,4 @@
-type TOrderStatus =
+export type TOrderStatus =
   | "pending"
   | "canceled"
   | "processing"
