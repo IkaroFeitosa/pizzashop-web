@@ -6,13 +6,17 @@ import { vi } from "vitest";
 const onPageChangeCallback = vi.fn();
 
 describe("Pagination", () => {
+  beforeEach(() => {
+    onPageChangeCallback.mockClear();
+  });
+
   it("should display the right amount of page and results", () => {
     const wrapper = render(
       <Pagination
         pageIndex={0}
         totalCount={200}
         perPage={10}
-        onPageChange={() => {}}
+        onPageChange={onPageChangeCallback}
       />,
     );
     expect(wrapper.getByText("Página 1 de 20")).toBeInTheDocument();
@@ -37,5 +41,62 @@ describe("Pagination", () => {
     await user.click(nextPageButton);
 
     expect(onPageChangeCallback).toHaveBeenCalledWith(1);
+  });
+  it("should be able to navigate to the previous page", async () => {
+    const wrapper = render(
+      <Pagination
+        pageIndex={5}
+        totalCount={200}
+        perPage={10}
+        onPageChange={onPageChangeCallback}
+      />,
+    );
+
+    const previousPageButton = wrapper.getByRole("button", {
+      name: "Página anterior",
+    });
+
+    const user = userEvent.setup();
+    await user.click(previousPageButton);
+
+    expect(onPageChangeCallback).toHaveBeenCalledWith(4);
+  });
+  it("should be able to navigate to the first page", async () => {
+    const wrapper = render(
+      <Pagination
+        pageIndex={5}
+        totalCount={200}
+        perPage={10}
+        onPageChange={onPageChangeCallback}
+      />,
+    );
+
+    const firstPageButton = wrapper.getByRole("button", {
+      name: "Primeira página",
+    });
+
+    const user = userEvent.setup();
+    await user.click(firstPageButton);
+
+    expect(onPageChangeCallback).toHaveBeenCalledWith(0);
+  });
+  it("should be able to navigate to the last page", async () => {
+    const wrapper = render(
+      <Pagination
+        pageIndex={0}
+        totalCount={200}
+        perPage={10}
+        onPageChange={onPageChangeCallback}
+      />,
+    );
+
+    const lastPageButton = wrapper.getByRole("button", {
+      name: "Última página",
+    });
+
+    const user = userEvent.setup();
+    await user.click(lastPageButton);
+
+    expect(onPageChangeCallback).toHaveBeenCalledWith(19);
   });
 });
