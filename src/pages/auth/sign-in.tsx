@@ -34,14 +34,17 @@ export function Signin() {
   });
 
   async function handleSignIn(data: SignInForm) {
-    console.log(data);
-    await authenticate({ email: data.email });
-    toast.success("Enviamos um link de autenticação para seu e-mail", {
-      action: {
-        label: "Reenviar!",
-        onClick: () => handleSignIn(data),
-      },
-    });
+    try {
+      await authenticate({ email: data.email });
+      toast.success("Enviamos um link de autenticação para seu e-mail", {
+        action: {
+          label: "Reenviar!",
+          onClick: () => handleSignIn(data),
+        },
+      });
+    } catch (error) {
+      toast.error("Erro ao logar");
+    }
   }
   return (
     <div>
