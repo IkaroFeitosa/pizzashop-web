@@ -31,21 +31,27 @@ export function SignUp() {
 
   const { mutateAsync: registerRestaurantFn } = useMutation({
     mutationFn: registerRestaurant,
+    onError: (error: any) => {
+      toast.error(
+        error.response?.data?.message || "Erro ao cadastrar restaurante",
+      );
+    },
+    onSuccess: (_, data) => {
+      toast.success("Restaurante cadastrado com sucesso!", {
+        action: {
+          label: "Fazer login",
+          onClick: () => navigate(`/sign-in?email=${data.email}`),
+        },
+      });
+    },
   });
 
   async function handleSignUp(data: SignUpForm) {
-    console.log(data);
     await registerRestaurantFn({
       email: data.email,
       managerName: data.managerName,
       phone: data.phone,
       restaurantName: data.restaurantName,
-    });
-    toast.success("Restaurante cadastrado com sucesso!", {
-      action: {
-        label: "Fazer login",
-        onClick: () => navigate(`/sign-in?email=${data.email}`),
-      },
     });
   }
   return (
