@@ -8,7 +8,7 @@ test("sign in successfully", async ({ page }) => {
   const toast = page.getByText(
     "Enviamos um link de autenticação para seu e-mail",
   );
-  expect(toast).toBeVisible();
+  await expect(toast).toBeVisible();
 });
 
 test("sign in with invalid email", async ({ page }) => {
@@ -16,7 +16,7 @@ test("sign in with invalid email", async ({ page }) => {
   await page.fill('input[name="email"]', "teste@test.com");
   await page.getByRole("button", { name: "Acessar painel" }).click();
   const toast = page.getByText("Erro ao logar");
-  expect(toast).toBeVisible();
+  await expect(toast).toBeVisible();
 });
 
 test("navigate to new restaurant page", async ({ page }) => {
